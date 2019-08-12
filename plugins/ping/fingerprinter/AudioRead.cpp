@@ -11,11 +11,11 @@ using namespace std;
 
 void AudioRead(QString directory, QString file)
 {
-  	int i;
+  	unsigned int i;
   	int err;  
   
   	unsigned int rate = 16000;		//44100;
-	int buffer_frames = 2;
+	int buffer_frames = 1;
   	snd_pcm_t *capture_handle;
   	snd_pcm_hw_params_t *hw_params;
  	snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
@@ -87,12 +87,18 @@ void AudioRead(QString directory, QString file)
   	}
 
   	cout << "audio interface prepared\n";
-
-  	int buffer[buffer_frames * snd_pcm_format_width(format) / 8 * 2];    //bytes from two channels * frames per s ??
-
+	int buffersize = 2*buffer_frames * snd_pcm_format_width(format)/8;
+  	int buffer[buffersize];    //bytes from two channels * frames per s ??
+	//cout << std::to_string(buffer.size()) << "\n";
   	cout << "buffer allocated\n";
-
-
+/*
+	QFile audioFile(directory + "test.pcm");
+	if(!audioFile.exists()) qDebug() << "auidoiFILE DOES NOT EXIST";
+	if(!audioFile.open(QIODevice::WriteOnly | QFile::Truncate)){
+		qDebug() << "something wrong with aiosduuFile (AudioRead())";
+	}
+	QTextStream audio(&audioFile);
+*/
 
 	QFile outFile(directory + file);
 	if(!outFile.exists()) qDebug() << "OUTFILE DOES NOT EXIST";
@@ -100,15 +106,19 @@ void AudioRead(QString directory, QString file)
 		qDebug() << "something wrong with outFile (AudioRead())";
 	}
 	QTextStream out(&outFile);
-  	for (i = 0; i < rate * buffer_frames; ++i) {
+  	for (i = 0; i < rate * 2; ++i) { //2.625
     	if ((err = snd_pcm_readi (capture_handle, buffer, buffer_frames)) != buffer_frames) {
       		cerr << "read from audio interface failed \n";
       		exit (1);
     	}
+	//	audio << *buffer;
     	//cout << "read " << i << " done\n";
-		out << *buffer/65536 << "\n";
+	//for(i = 0; i < buffersize; i++){
+		out << *buffer/32768.0 << "\n";//32768.0
 	}
+
 	outFile.close();
+	//audioFile.close();
 	snd_pcm_close (capture_handle);
 	cout << "audio interface closed\n";
 

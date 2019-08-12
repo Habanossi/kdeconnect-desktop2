@@ -38,8 +38,10 @@ QtObject {
     property variant hello: null
 
     function ring() {
+		console.log("heyooo\n");
         if (hello) {
             hello.sendHello();
+			console.log("oooyeh\n");
         }
     }
 

@@ -31,9 +31,9 @@ int readWav(){
     wavHeader* newWav = (wavHeader*)malloc(sizeof(wavHeader) + 1);
 
 	FILE* myFile;							//Open wave file in read mode
-	myFile = fopen("Sounds/SX83.wav","rb");//Sounds/SX83.wav
+	myFile = fopen("/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/Sounds/HTC_2s_Resampled_mono.wav","rb");//Sounds/SX83.wav
 	ofstream oFile;
-	oFile.open("data/raw.dat");
+	oFile.open("/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/raw.dat");
 
 	fseek (myFile, 0, SEEK_END);   			// non-portable
     int fileSize = ftell(myFile); 			//Returns the current value of the position indicator of the stream.

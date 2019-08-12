@@ -23,6 +23,13 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 configure_file(kdeconnect-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/kdeconnect-version.h)
 
+set_package_properties(KF5Kirigami2 PROPERTIES
+DESCRIPTION "QtQuick plugins to build user interfaces based on KDE UX guidelines"
+PURPOSE "Required for KDE Connect's QML-based GUI appications"
+URL "https://www.kde.org/products/kirigami/"
+TYPE RUNTIME
+)
+
 include(KDEInstallDirs)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
@@ -48,8 +55,9 @@ endif()
 add_subdirectory(icon)
 add_subdirectory(interfaces)
 
-option(EXPERIMENTALAPP_ENABLED OFF)
+option(EXPERIMENTALAPP_ENABLED ON)
 if(EXPERIMENTALAPP_ENABLED)
+	find_package(KF5Kirigami2)
     add_subdirectory(app)
 endif()
 add_subdirectory(daemon)

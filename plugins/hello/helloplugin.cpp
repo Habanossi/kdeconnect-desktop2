@@ -50,15 +50,14 @@ bool HelloPlugin::receivePacket(const NetworkPacket& np)
     Daemon::instance()->sendSimpleNotification(QStringLiteral("pingReceived"), device()->name(), np.get<QString>(QStringLiteral("message"),i18n("Hello!")), QStringLiteral("dialog-ok"));
 	QString qs = np.get<QString>(QStringLiteral("message"));
 	std::cout << "message received\n";
-	//qDebug() << qs << "\n";
 	QFile dataFile("/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/phonedata.txt");
 	if(!dataFile.open(QIODevice::WriteOnly | QFile::Truncate)){
 		qDebug() << "Cannot open dataFile";
 	}
 	QTextStream data(&dataFile);	
 	data << qs;	
-	//qDebug() << "message: " << qs;	
 	dataFile.close();
+	//np.set(QStringLiteral("message"), "");
     return true;
 }
 

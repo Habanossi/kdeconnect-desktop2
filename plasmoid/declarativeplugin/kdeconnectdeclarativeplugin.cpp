@@ -19,6 +19,7 @@
  */
 
 #include "kdeconnectdeclarativeplugin.h"
+#include <iostream>
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -32,7 +33,6 @@
 #include "interfaces/devicessortproxymodel.h"
 #include "interfaces/devicesmodel.h"
 #include "interfaces/notificationsmodel.h"
-#include "interfaces/devicehellointerface.h"
 
 QObject* createDeviceDbusInterface(const QVariant& deviceId)
 {
@@ -74,11 +74,20 @@ QObject* createDeviceLockInterface(const QVariant& deviceId)
     Q_ASSERT(!deviceId.toString().isEmpty());
     return new LockDeviceDbusInterface(deviceId.toString());
 }
-
+//Hello
 QObject* createHelloInterface(const QVariant& deviceId)
 {
-    return new HelloDbusInterface(deviceId.toString());
+    return new HelloDeviceDbusInterface(deviceId.toString());
 }
+//Ping
+/*QObject* createPingInterface(const QVariant& deviceId)
+{
+	std::cout << "Creating PingInterface\n";
+	QObject* sdf = new PingDeviceDbusInterface(deviceId.toString());
+	std::cout << "PingInterface successfully created\n";
+    return sdf;
+	
+}*/
 
 QObject* createDBusResponse()
 {
@@ -96,7 +105,8 @@ void KdeConnectDeclarativePlugin::registerTypes(const char* uri)
     qmlRegisterUncreatableType<FindMyPhoneDeviceDbusInterface>(uri, 1, 0, "FindMyPhoneDbusInterface", QStringLiteral("You're not supposed to instantiate interfacess"));
     qmlRegisterUncreatableType<RemoteKeyboardDbusInterface>(uri, 1, 0, "RemoteKeyboardDbusInterface", QStringLiteral("You're not supposed to instantiate interfacess"));
     qmlRegisterUncreatableType<DeviceDbusInterface>(uri, 1, 0, "DeviceDbusInterface", QStringLiteral("You're not supposed to instantiate interfacess"));
-	qmlRegisterUncreatableType<HelloDbusInterface>(uri, 1, 0, "HelloDbusInterface", QStringLiteral("You're not supposed to instantiate interfacess"));
+//	qmlRegisterUncreatableType<HelloDeviceDbusInterface>(uri, 1, 0, "HelloDbusInterface", QStringLiteral("You're not supposed to instantiate interfaces"));
+	//qmlRegisterUncreatableType<PingDeviceDbusInterface>(uri, 1, 0, "PingDeviceDbusInterface", QStringLiteral("You're not supposed to instantiate interfaces"));
     qmlRegisterSingletonType<DaemonDbusInterface>(uri, 1, 0, "DaemonDbusInterface",
         [](QQmlEngine*, QJSEngine*) -> QObject* {
             return new DaemonDbusInterface;
@@ -132,9 +142,13 @@ void KdeConnectDeclarativePlugin::initializeEngine(QQmlEngine* engine, const cha
     engine->rootContext()->setContextProperty(QStringLiteral("LockDeviceDbusInterfaceFactory")
       , new ObjectFactory(engine, createDeviceLockInterface));
 
-	engine->rootContext()->setContextProperty(QStringLiteral("HelloDbusInterfaceFactory")
+	engine->rootContext()->setContextProperty(QStringLiteral("HelloDeviceDbusInterfaceFactory") //Hello
       , new ObjectFactory(engine, createHelloInterface));
-    
+
+	/*engine->rootContext()->setContextProperty(QStringLiteral("PingDbusInterfaceFactory") //Ping	
+      , new ObjectFactory(engine, createPingInterface));
+	std::cout << "factory successfully created\n";
+	  */  
     engine->rootContext()->setContextProperty(QStringLiteral("DBusResponseFactory")
       , new ObjectFactory(engine, createDBusResponse));    
     

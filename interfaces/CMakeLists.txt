@@ -44,7 +44,8 @@ geninterface(${CMAKE_SOURCE_DIR}/plugins/remotecontrol/remotecontrolplugin.h rem
 geninterface(${CMAKE_SOURCE_DIR}/plugins/lockdevice/lockdeviceplugin.h lockdeviceinterface)
 geninterface(${CMAKE_SOURCE_DIR}/plugins/remotecommands/remotecommandsplugin.h remotecommandsinterface)
 geninterface(${CMAKE_SOURCE_DIR}/plugins/remotekeyboard/remotekeyboardplugin.h remotekeyboardinterface)
-geninterface(${CMAKE_SOURCE_DIR}/plugins/hello/helloplugin.h devicehellointerface)
+geninterface(${CMAKE_SOURCE_DIR}/plugins/hello/helloplugin.h hellointerface)
+geninterface(${CMAKE_SOURCE_DIR}/plugins/ping/pingplugin.h devicepinginterface)
 
 
 add_library(kdeconnectinterfaces SHARED ${libkdeconnect_SRC})

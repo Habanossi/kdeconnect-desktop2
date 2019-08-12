@@ -48,17 +48,17 @@ Kirigami.Page
                         text: i18n("Unpair")
                     },
                     Kirigami.Action {
-                        text: i18n("Send Ping")
+                        text: i18n("Send Pling")
                         onTriggered: {
                             deviceView.currentDevice.pluginCall("ping", "sendPing");
                         }
                     }
-					Kirigami.Action {
+					/*Kirigami.Action {
                         text: i18n("Send Hello")
                         onTriggered: {
                             deviceView.currentDevice.pluginCall("hello", "sendHello");
                         }
-                    }
+                    }*/
                 ]
 
                 id: trustedView
