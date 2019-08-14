@@ -49,13 +49,15 @@ Eigen::MatrixXd window(QString directory, QString file, int frameLength, int hop
 		for(double i = 0.5; i < frameLength; i+=3){
 			point = sin(M_PI*i / frameLength);
 			windowFunction.push_back(point);
+				//windowFunction.push_back(1);
 		}
 		for(int i = 0; i < frameLength - hopSize; i++){
-			windowFunction.push_back(1);
+			windowFunction.push_back(1.0);
 		}
 		for(double i = frameLength; i > 0.5; i-=3){
 			point =	sin(M_PI*i / frameLength);		
 			windowFunction.push_back(point);
+			//windowFunction.push_back(1);
 		}
 	}
 	else cout << "Windowing function not supported" << endl;

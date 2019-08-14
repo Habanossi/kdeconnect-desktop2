@@ -15,17 +15,17 @@
 #include <Eigen/Core>
 //</home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/eigen-eigen-323c052e1731/Eigen/Core>
 #include "AudioRead.cpp"
-
+///#include <thread>
 using namespace std;
 
 void fingerPrint(){
 	cout << "fingerPrint() start.\n";
-
+	//	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 	//INIT VARIABLES
 	QString dataDirectory = "/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/";
 	QString recordFile = "testRec.dat";
 	QString outputfile = "fingerprint.txt";
-	bool liveRecord = 0;
+	bool liveRecord = 1;
 	int sampleRate = 16000;
 	int sampleRateTarget = 16000;
 	int fpAmount = 1;

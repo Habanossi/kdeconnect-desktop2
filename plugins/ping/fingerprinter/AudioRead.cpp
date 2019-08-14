@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QTextStream>
+#include <sys/time.h>
 using namespace std;
 
 void AudioRead(QString directory, QString file)
@@ -19,8 +20,11 @@ void AudioRead(QString directory, QString file)
   	snd_pcm_t *capture_handle;
   	snd_pcm_hw_params_t *hw_params;
  	snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
-	
-
+	timeval tv;
+		gettimeofday(&tv, 0);
+		std::string time = to_string(tv.tv_sec) + to_string(tv.tv_usec/1000);
+		long l = stol(time);
+	std::cout << "Real time of recording: " << time << "\n";
   	if ((err = snd_pcm_open (&capture_handle, "default", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
     	cerr << "cannot open audio device " << " (" << snd_strerror (err) << ")\n";
     	exit (1);

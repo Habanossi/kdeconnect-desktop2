@@ -83,7 +83,7 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 				sum = log10(abs(sum));
 				mean += sum;										
 				enerFrame.push_back(sum);	
-				cout << sum << endl;												
+				//cout << sum << endl;												
 			}	
 			
 			mean /= enerFrame.size();

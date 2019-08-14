@@ -47,6 +47,7 @@ long timeAtStart = 0;
 int fpAmount = 1;
 std::string recordStartingTime = "";
 QString dataDirectory = "/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/";
+QString isC = "n111";
 
 PingPlugin::PingPlugin(QObject* parent, const QVariantList& args)
     : KdeConnectPlugin(parent, args)
@@ -61,40 +62,38 @@ PingPlugin::~PingPlugin()
 
 bool PingPlugin::receivePacket(const NetworkPacket& np)
 {
-	//int test = 1;
-	//QString dataDirectory = "/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/";
-
     Daemon::instance()->sendSimpleNotification(QStringLiteral("pingReceived"), device()->name(), np.get<QString>(QStringLiteral("message"),i18n("Pingman!")), QStringLiteral("dialog-ok"));
 	QString qs = np.get<QString>(QStringLiteral("message"));
 	phonedata = qs;
 	std::cout << "message received.\n";
-	if(!qs.contains("x")){
 	qDebug() << qs << "\n";
+	if(!qs.contains("x")){
 		timeval tv;
 		gettimeofday(&tv, 0);
 		std::string time = to_string(tv.tv_sec) + to_string(tv.tv_usec/1000);
 		long l = stol(time);
 		std::string tim = std::to_string(l);
-		//qDebug() << time << "\n";
-		//long l = stol(time,nullptr);
 		std::cout << "TimeStamp Laptop when received: " << tim << endl;
 		int offset = (l-timeAtStart)/2;
-		int waitT = 2000; + offset;
-		if(waitT > 20000){
-			std::cout << "WaitTime really long, abort\n";
-			//exit(1);
-		}
+		long waitT = timeAtStart + 3000;
 		long diffBetweenTimes = l - qs.toLong() + offset;
 		std::cout << "wait time: \n" << std::to_string(waitT) << "\n";
 		std::cout << "offset: \n" << std::to_string(offset) << "\n";
 		std::cout << "compare timestamps: " << std::to_string(diffBetweenTimes) << "\n";
 		std::cout << "Waiting...\n\n";
+		gettimeofday(&tv, 0);
+		time = to_string(tv.tv_sec) + to_string(tv.tv_usec/1000);
+		while (time.size() < 13){
+			time += "0";
+		}
+		l = stol(time);
+		waitT = timeAtStart + 3000 - l;
 		std::this_thread::sleep_for(std::chrono::milliseconds(waitT));
-	std::cout << "Starting to record\n\n";
+		std::cout << "Starting to record\n";
 		gettimeofday(&tv, 0);
 		recordStartingTime = to_string(tv.tv_sec) + to_string(tv.tv_usec/1000);
 		fingerPrint(); // Record audio, calculate fingerprint
-		std::cout << "start time for recording: " << recordStartingTime << " - " << std::to_string(diffBetweenTimes) << "\n";
+		std::cout << "start time for recording: " << recordStartingTime << /*" - " << std::to_string(diffBetweenTimes) <<*/ "\n";
 		for(int i = 0; i < fpAmount; i++){
 			cout << "copying fingerprint\n";
 			QFile fpFile(dataDirectory + "fingerprintdata/fingerprint" + QString::number(i) + ".txt");
@@ -109,6 +108,7 @@ bool PingPlugin::receivePacket(const NetworkPacket& np)
 				fingerPrint += in.readLine();
 				//fingerPrint += " ";
 			}
+			fpFile.close();
 			//const QString& fPrint = fingerPrint;
 			k[i] = fingerPrint;
 			laptopdata = fingerPrint;
@@ -126,7 +126,7 @@ bool PingPlugin::receivePacket(const NetworkPacket& np)
 		fpFile.close();	*/
 	}
 	else{
-		QFile dataFile("/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/phonedata.txt");
+		QFile dataFile(dataDirectory + "phonedata.txt");
 		if(!dataFile.open(QIODevice::WriteOnly | QFile::Truncate)){
 			qDebug() << "Cannot open dataFile";
 		}
@@ -135,27 +135,6 @@ bool PingPlugin::receivePacket(const NetworkPacket& np)
 		data << q;
 		phonedata = q;
 		dataFile.close();
-	}
-	test = 2;
-    return true;
-}
-
-void PingPlugin::sendPing()
-{
-
-	//QString dataDirectory = "/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/";
-	if(test == 1){
-		timeval tv;
-		gettimeofday(&tv, 0);
-		std::string time = to_string(tv.tv_sec) + to_string(tv.tv_usec/1000);
-		long l = stol(time);
-		timeAtStart = l;
-		std::string tim = std::to_string(l);
-		std::cout << "TimeStamp Laptop when sent: " << time << endl;
-		NetworkPacket np(PACKET_TYPE_PING);
-    	/*bool success = */sendPacket(np);	
-	}
-	else if (test == 2){
 		for(int i = 0; i < fpAmount; i++){
 			int matchcount = 0;		
 			//k[i] = k[i].trimmed();
@@ -166,12 +145,52 @@ void PingPlugin::sendPing()
 				}
 			}		
 			cout << "matchcount: " << matchcount << "\n";	
+			cout << to_string(matchcount/540.0 *100) << " percent match." << "\n";
+			if(matchcount > 330){
+				cout << "pairing is secure and private\n";
+				isC = "y" + QString::number(matchcount);
+			}else{
+				cout << "can't establish a private connection\n";
+				isC = "n" + QString::number(matchcount);
+			}
 		}
-		test = 1;	
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		sendPing();
 	}
-	else {
-		fingerPrint(); // Record audio, calculate fingerprint
-		QFile fpFile(dataDirectory + "fingerprint.txt");
+	//test = 2;
+    return true;
+}
+
+void PingPlugin::sendPing()
+{
+
+	//QString dataDirectory = "/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/";
+	timeval tv;
+	gettimeofday(&tv, 0);
+	std::string s = to_string(tv.tv_usec);
+	std::cout << s << std::endl;
+	std::string time = to_string(tv.tv_sec) + s[0] + s[1];
+	while (time.size() < 13){
+		time += "0";
+	}
+	const QString& tTime = QString::fromStdString(time);
+	long l = stol(time);
+	timeAtStart = l;
+	std::string tim = std::to_string(l);
+	std::cout << "TimeStamp Laptop when sent: " << time << endl;
+	NetworkPacket np(PACKET_TYPE_PING);
+	np.set(QStringLiteral("message"), isC + tTime);		
+	bool success = sendPacket(np);	
+	/*std::cout << success << std::endl;
+	std::cout << "Waiting...\n\n";
+	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+	recordStartingTime = to_string(tv.tv_sec) + to_string(tv.tv_usec/1000);
+	fingerPrint(); // Record audio, calculate fingerprint
+	std::cout << "start time for recording: " << recordStartingTime << "\n";
+	for(int i = 0; i < fpAmount; i++){
+		cout << "copying fingerprint\n";
+		QFile fpFile(dataDirectory + "fingerprintdata/fingerprint" + QString::number(i) + ".txt");
+		//QFile fpFile(dataDirectory + "fingerprintdata/fingerprint.txt");
 		if(!fpFile.exists()){ qDebug() << "FILE DOES NOT EXIST"; exit(1); }
 		if(!fpFile.open(QIODevice::ReadOnly)){
 			qDebug() << "something wrong with fpFile";
@@ -182,14 +201,12 @@ void PingPlugin::sendPing()
 			fingerPrint += in.readLine();
 			//fingerPrint += " ";
 		}
-		const QString& fPrint = fingerPrint;
-		qDebug() << fingerPrint << "is the messs";
-   		 NetworkPacket np(PACKET_TYPE_PING);
-		np.set(QStringLiteral("message"), fPrint);		
-    	bool success = sendPacket(np);
-    	qCDebug(KDECONNECT_PLUGIN_PING) << "sendPing:" << success;
-		fpFile.close();
-	}
+		//const QString& fPrint = fingerPrint;
+		k[i] = fingerPrint;
+		laptopdata = fingerPrint;
+		qDebug() << laptopdata << "\n";
+	}*/
+
 }
 
 void PingPlugin::sendPing(const QString& customMessage)
