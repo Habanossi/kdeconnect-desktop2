@@ -36,7 +36,7 @@ class Q_DECL_EXPORT PingPlugin
 public:
     explicit PingPlugin(QObject* parent, const QVariantList& args);
     ~PingPlugin() override;
-
+	void sendFunction();
     Q_SCRIPTABLE void sendPing();
     Q_SCRIPTABLE void sendPing(const QString& customMessage);
 

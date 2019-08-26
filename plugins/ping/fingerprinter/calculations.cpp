@@ -8,18 +8,17 @@
 #include "string.h"
 #include <fftw3.h>
 #include <Eigen/Core>
+#include <limits>
 
 using namespace std;
 
 void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energyfile, int frameStart){
 
 	QString dataDirectory = "/home/hermanni/kdeconnect-kde-1.3.4/plugins/ping/fingerprinter/data/";
-	bool avg = 1;
+	bool avg = true;
 	int sampleRate = 16000;
 	int frameLength = sampleRate * 0.03; 	//flattop: 0.03
 	int hopSize 	= sampleRate * 0.02; 	//flattop: 0.02 (2/3 overlap)	
-
-
 
 	double matrixSize = frameMatrix.rows() * frameMatrix.cols();					//total size of frameMatrix (n x m)
 	//FFT
@@ -44,8 +43,9 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 		}																//
 		fftw_execute(p);												//execute fft for each column
 		for(int j = N/2+1; j > 0; j--){									//
-			fft << 20*log10(sqrt(out[j][0]*out[j][0] + out[j][1]*out[j][1])) << endl;	//send output to textfile
-			outVCol.push_back(20*log10(sqrt(out[j][0]*out[j][0] + out[j][1]*out[j][1])));	//abs(out[j][0] + out[j][1]))) if want errored
+			double val = 20*log10(sqrt(out[j][0]*out[j][0] + out[j][1]*out[j][1]) + std::numeric_limits<double>::epsilon());
+			fft << val << endl;	//send output to textfile
+			outVCol.push_back(val);	
 		}
 		outV.push_back(outVCol);
 		outVCol.clear();
@@ -56,13 +56,7 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
     fftw_free(in); 			//free allocated memory
 	fftw_free(out);			//
 
-
-
-
 	//Energy bands
-
-
-
 	cout << "SIZE OF MATRIX: " << outV.size() << " x " << outV[0].size() << endl;
 	int nEnerBands = 32;
 	vector<vector<double>> enerOut = {};
@@ -85,7 +79,6 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 				enerFrame.push_back(sum);	
 				//cout << sum << endl;												
 			}	
-			
 			mean /= enerFrame.size();
 			//cout << "mean: " << mean << " enerframesize: " << enerFrame.size() <<  endl;
 			for(unsigned int k = 0; k < enerFrame.size(); k++){			
@@ -121,21 +114,6 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 			}
 			avgEner.push_back(avgEnerFrame);
 			avgEnerFrame.clear();
-			/*unsigned int idxEnd;
-			if(i+5 < enerOut[0].size()) idxEnd = i+5;
-			else idxEnd = enerOut[0].size();	
-			for(unsigned int j = 0; j < enerOut.size(); j++){		
-				int mean = 0;
-				int div = 0;
-				for(unsigned int k = i; k < idxEnd; k++){			
-					mean += enerOut[j][k];
-					div++;
-				}
-				if(div != 0) mean /= div;
-				avgEnerFrame.push_back(mean);
-			}
-			avgEner.push_back(avgEnerFrame);
-			avgEnerFrame.clear();*/
 		}
 	}
 
@@ -241,7 +219,12 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 
 	int nEnerBandsUsed = nEnerBands - yMin - yMax;
 	cout << nEnerBandsUsed << " is the size of nEnerBandsUsed\n";
-	int nFramesUsed = avgEner[0].size()/*enerOut[0].size()*/ - xMin - xMax;
+	int nFramesUsed;
+	if(avg){
+		nFramesUsed = avgEner[0].size() - xMin - xMax;
+	}else{
+		nFramesUsed = enerOut[0].size() - xMin - xMax;
+	}
 	cout << nFramesUsed << " is the size of nFramesUsed\n";
 	double ctxBands[nFramesUsed][ctxShapeData.size()/2][nEnerBandsUsed] = {};
 	double multAux [nFramesUsed][ctxShapeData.size()/2][nEnerBandsUsed] = {};
@@ -258,8 +241,11 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 				int ctxIdx = ctxOptData[k*nEnerBandsUsed + i] - 1;
 				int idy = j + yMin + ctxShapeData[ctxIdx*2 + 1];
 				int idx = i + xMin + ctxShapeData[ctxIdx*2];
-				ctxBands[j][k][i] = avgEner[idx][idy];//enerOut[idx][idy];
-				//cout << "enerout: " << enerOut[idx][idy] << "\n";
+				if(avg){
+					ctxBands[j][k][i] = avgEner[idx][idy];				
+				}else{
+					ctxBands[j][k][i] = enerOut[idx][idy];
+				}
 				v(k) = ctxBands[j][k][i];
 				//cout << v(k) << "\n";
 				mean += v(k);
@@ -269,13 +255,9 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 			for(int k = 0; k < 9; k++){
 				v(k) -= mean;
 			}
-			//cout << "round\n";
-			//v.transpose();
 			//cout << tRealMatData[i] << endl;
 			tRealMatData[i].transposeInPlace();
 			x = tRealMatData[i] * v;
-			//x.transposeInPlace();
-			//cout << x << endl;
 			for(unsigned int k = 0; k < ctxShapeData.size()/2; k++){
 				multAux[j][k][i] = x(k);
 			}

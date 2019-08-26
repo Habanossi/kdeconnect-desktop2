@@ -18,26 +18,26 @@ using namespace std;
 
 
 //vector<vector<double>> window(QString directory, QString file, int frameLength, int hopSize, string windowType){
-Eigen::MatrixXd window(QString directory, QString file, int frameLength, int hopSize, string windowType, vector<double> data){
-	//vector<vector<double>>	frameMatrix = {};
-	//vector<double> 			frame = {};
-	vector<double> 			windowFunction = {};	
-	vector<double> 			dataV = data;
+Eigen::MatrixXd window(QString directory, QString file, int frameLength, int hopSize, string windowType){
 
-	//QFile inFile(directory + file);
-	//if(!inFile.open(QIODevice::ReadOnly | QIODevice::Text)){
-	//	qDebug() << "something wrong with inFile";
-	//}
-	//QTextStream in(&inFile);
-	//double value;
-	//do{
-	//	value = in.readLine().toDouble();
-	//	dataV.push_back(value);							//All data moved from list.dat to dataV, kinda unnecessary to put it in textfile, could fix
-	//}while(!in.atEnd());								
-	//inFile.close();
-	cout << "works" << hopSize <<"\n";
+	vector<double> 			windowFunction = {};	
+	vector<double> 			dataV = {};
+
+	QFile inFile(directory + file);
+	if(!inFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+		qDebug() << "something wrong with inFile";
+	}
+	QTextStream in(&inFile);
+	double value;
+	do{
+		value = in.readLine().toDouble();
+		dataV.push_back(value);						//All data moved from testRec.dat to dataV, kinda unnecessary to put it in textfile, could fix
+	}while(!in.atEnd());								
+	inFile.close();
+
 	int numberOfFrames = 1 + floor((dataV.size() - frameLength) / hopSize);
 		cout << "numberofframes: " << numberOfFrames << endl;
+
 	if(windowType == "hamming"){						//Implement Hamming window  w(n)=0.54−0.46cos(2πn/M−1),   0≤n≤M−1
 		for(int i = 0; i < frameLength - 1; i++){ 
 			double point = 0.54 - 0.46*cos((2*M_PI*i)/(frameLength-1));
@@ -68,7 +68,6 @@ Eigen::MatrixXd window(QString directory, QString file, int frameLength, int hop
 		qDebug() << "something wrong with outFile";
 	}
 	QTextStream out(&outFile);	
-	//int c, e = 0;
 	Eigen::MatrixXd x(numberOfFrames,frameLength);
 	for(int i = 0; i < numberOfFrames; i++){ 						//for each row
 		for(int j = 0; j < frameLength; j++){						//for each column
@@ -76,28 +75,13 @@ Eigen::MatrixXd window(QString directory, QString file, int frameLength, int hop
 			//cout << dataPoint << endl;
 			if(dataPoint){
 				dataPoint *= windowFunction[j];						//assign correct data point * windowing function point
-				x(i,j) = dataPoint;
-				/*int d = c % 3;
-				int arrayJStart = j + (d/3)*frameLength;
-				if(arrayJStart >= frameLength){
-					x(i-(e-1),arrayJStart - frameLength) = dataPoint;
-				}
-				else{
-					x(i - e, arrayJStart) = dataPoint;
-				}*/
-				//frame.push_back(dataPoint); 						
+				x(i,j) = dataPoint;						
 				out << dataPoint << "\n";
 			} else out << 0 << "\n";
 		}
-		//frameMatrix.push_back(frame);
-		//frame.clear();
-		//c += 2;
-		//if(c % 3 == 2) e++;
 	}
 	outFile.close();
-
 	return x;
-	//return frameMatrix;
 }
 
 
