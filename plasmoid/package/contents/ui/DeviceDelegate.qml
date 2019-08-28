@@ -127,21 +127,21 @@ PlasmaComponents.ListItem
                     findmyphone.ring()
                 }
             }
-			//Hello // no, Ping
+			//Privacy
             PlasmaComponents.Button
             {
-                Ping {
-                    id: ping
+                Privacy {
+                    id: privacy
                     device: root.device
                 }
 
-                id: sendPing
+                id: sendPrivacy
                 iconSource: "irc-voice"
-                visible: ping.available
-                tooltip: i18n("Ping")
+                visible: privacy.available
+                tooltip: i18n("Privacy")
 
                 onClicked: {
-                    ping.ring()
+                    privacy.ring()
                 }
             }
             //SFTP

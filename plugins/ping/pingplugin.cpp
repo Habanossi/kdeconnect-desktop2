@@ -74,6 +74,10 @@ bool PingPlugin::receivePacket(const NetworkPacket& np)
 		sendFunction();
 		first = true;
 	}
+	else if(message == "reset"){
+		first = false;
+		tick = 1;
+	}
 	
 	else if(tick == 1){
 		tick = 0;
@@ -173,12 +177,15 @@ void PingPlugin::sendFunction(){
 		tick = 1;
 	}
 }
-
+//this function is called whenever ping is sent from app
 void PingPlugin::sendPing(){
 	if(tick != 1 || first){
 		tick = 1;
 		first = false;
 		cout << "Fixing variables" << endl;
+		NetworkPacket np(PACKET_TYPE_PING);
+		np.set(QStringLiteral("message"), "reset");
+		sendPacket(np);
 	}else{
 		NetworkPacket np(PACKET_TYPE_PING);
 		np.set(QStringLiteral("message"), "first");

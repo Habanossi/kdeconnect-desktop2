@@ -27,7 +27,7 @@ if(EXPERIMENTALAPP_ENABLED)
     add_subdirectory(remotecontrol)
     add_subdirectory(lockdevice)
 endif()
-add_subdirectory(hello)
+add_subdirectory(privacy)
 
 #FIXME: If we split notifications in several files, they won't appear in the same group in the Notifications KCM
 install(FILES kdeconnect.notifyrc DESTINATION ${KNOTIFYRC_INSTALL_DIR})

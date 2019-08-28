@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     parser.addOption(QCommandLineOption(QStringLiteral("execute-command"), i18n("Executes a remote command by id"), QStringLiteral("id")));
     parser.addOption(QCommandLineOption(QStringList{QStringLiteral("k"), QStringLiteral("send-keys")}, i18n("Sends keys to a said device"), QStringLiteral("key")));
     parser.addOption(QCommandLineOption(QStringLiteral("my-id"), i18n("Display this device's id and exit")));
-	parser.addOption(QCommandLineOption(QStringLiteral("hello"), i18n("Sends hello to said device")));
+	parser.addOption(QCommandLineOption(QStringLiteral("privacy"), i18n("Starts a privacy test")));
     about.setupCommandLine(&parser);
 
     parser.addHelpOption();

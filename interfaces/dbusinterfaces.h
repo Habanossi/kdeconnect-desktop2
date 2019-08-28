@@ -35,8 +35,8 @@
 #include "interfaces/lockdeviceinterface.h"
 #include "interfaces/remotecommandsinterface.h"
 #include "interfaces/remotekeyboardinterface.h"
-#include "interfaces/hellointerface.h"
-#include "interfaces/devicepinginterface.h"
+#include "interfaces/privacyinterface.h"
+//#include "interfaces/devicepinginterface.h"
 /**
  * Using these "proxy" classes just in case we need to rename the
  * interface, so we can change the class name in a single place.
@@ -176,23 +176,23 @@ public:
     ~FindMyPhoneDeviceDbusInterface() override;
 };
 
-class KDECONNECTINTERFACES_EXPORT HelloDeviceDbusInterface
-    : public OrgKdeKdeconnectDeviceHelloInterface
+class KDECONNECTINTERFACES_EXPORT PrivacyDbusInterface
+    : public OrgKdeKdeconnectDevicePrivacyInterface
 {
     Q_OBJECT
 public:
-    explicit HelloDeviceDbusInterface(const QString& deviceId, QObject* parent = nullptr);
-    ~HelloDeviceDbusInterface() override;
+    explicit PrivacyDbusInterface(const QString& deviceId, QObject* parent = nullptr);
+    ~PrivacyDbusInterface() override;
 };
 
-class KDECONNECTINTERFACES_EXPORT PingDeviceDbusInterface
+/*class KDECONNECTINTERFACES_EXPORT PingDeviceDbusInterface
     : public OrgKdeKdeconnectDevicePingInterface
 {
     Q_OBJECT
 public:
     explicit PingDeviceDbusInterface(const QString& deviceId, QObject* parent = nullptr);
     ~PingDeviceDbusInterface() override;
-};
+};*/
 
 
 class KDECONNECTINTERFACES_EXPORT RemoteCommandsDbusInterface

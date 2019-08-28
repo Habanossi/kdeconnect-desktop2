@@ -149,24 +149,24 @@ FindMyPhoneDeviceDbusInterface::FindMyPhoneDeviceDbusInterface(const QString& de
 FindMyPhoneDeviceDbusInterface::~FindMyPhoneDeviceDbusInterface()
 {
 }
-//Hello
-HelloDeviceDbusInterface::HelloDeviceDbusInterface(const QString& deviceId, QObject* parent):
-    OrgKdeKdeconnectDeviceHelloInterface(DaemonDbusInterface::activatedService(), "/modules/kdeconnect/devices/" + deviceId + "/hello", QDBusConnection::sessionBus(), parent)
+//Privacy
+PrivacyDbusInterface::PrivacyDbusInterface(const QString& deviceId, QObject* parent):
+    OrgKdeKdeconnectDevicePrivacyInterface(DaemonDbusInterface::activatedService(), "/modules/kdeconnect/devices/" + deviceId + "/privacy", QDBusConnection::sessionBus(), parent)
 {
 }
 
-HelloDeviceDbusInterface::~HelloDeviceDbusInterface()
+PrivacyDbusInterface::~PrivacyDbusInterface()
 {
 }
 //Ping
-PingDeviceDbusInterface::PingDeviceDbusInterface(const QString& deviceId, QObject* parent):
+/*PingDeviceDbusInterface::PingDeviceDbusInterface(const QString& deviceId, QObject* parent):
     OrgKdeKdeconnectDevicePingInterface(DaemonDbusInterface::activatedService(), "/modules/kdeconnect/devices/" + deviceId + "/ping", QDBusConnection::sessionBus(), parent)
 {
 }
 
 PingDeviceDbusInterface::~PingDeviceDbusInterface()
 {
-}
+}*/
 
 RemoteCommandsDbusInterface::RemoteCommandsDbusInterface(const QString& deviceId, QObject* parent):
     OrgKdeKdeconnectDeviceRemotecommandsInterface(DaemonDbusInterface::activatedService(), "/modules/kdeconnect/devices/" + deviceId + "/remotecommands", QDBusConnection::sessionBus(), parent)

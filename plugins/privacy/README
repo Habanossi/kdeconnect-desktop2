@@ -1,0 +1,3 @@
+
+This plugin starts a recording loop with the other device, that checks whether the connection between them is private,
+based on the audio environmentthey are in.
