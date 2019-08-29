@@ -21,9 +21,9 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 	int hopSize 	= sampleRate * 0.02; 	//flattop: 0.02 (2/3 overlap)	
 
 	double matrixSize = frameMatrix.rows() * frameMatrix.cols();					//total size of frameMatrix (n x m)
-
 	//FFT
 	matrixSize = 99*480;
+
 	cout << "matrixSize: " << frameMatrix.rows() << " x " << frameMatrix.cols() << endl;
 	double* in = (double*) fftw_malloc(sizeof(double) * matrixSize);	//allocate fft-input array
 	fftw_complex *out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * matrixSize/2 + 1);	//allocate fft-output array
@@ -33,7 +33,7 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 	if(!fftFile.open(QIODevice::WriteOnly | QFile::Truncate)){
 		qDebug() << "Cannot open fftFile";
 	}
-	QTextStream fft(&fftFile); 											//open textfile for data to matlab for testing
+	QTextStream fft(&fftFile); 										//open textfile for data to matlab for testing
 	vector<vector<double>> outV = {};									//vector for fft-output data
 	vector<double> outVCol = {};
     p = fftw_plan_dft_r2c_1d(N, in, out, FFTW_MEASURE);					//init fft-plan
@@ -92,6 +92,7 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 	}
 	cout << "starting to average time intervals.\n";
 	//AVGENERTIME, enerout[32][99]
+	//double avgEner[32][20] = {};
 	vector<vector<double>> avgEner = {};
 	vector<double> avgEnerFrame = {};
 	if(avg){
@@ -99,7 +100,7 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 		for(int i = 0; i < 32; i++){
 			count = 0;
 			for(int j = 98; j > 0; j--){
-				if(count % avgLen == 0){
+				if(count % avgLen == 0){// && count != 0){
 					double sum = 0;	
 					for(int k = 0; k < avgLen; k++){
 						//cout << k << endl;
@@ -233,8 +234,6 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 	cout << "enerOut.size: " << enerOut.size() << endl;
 	cout << "enerOut[0].size: " << enerOut[0].size() << endl;
 
-
-	//Calculate decorrelation
 	for(int i = 0; i < nEnerBandsUsed; i++){								//30
 		for(int j = 0; j < nFramesUsed; j++){ 								//97
 			int mean = 0;	
@@ -272,8 +271,6 @@ void calculations(Eigen::MatrixXd frameMatrix, QString outputfile, QString energ
 	}
 	QTextStream outputDecor(&outputDecorFile);	
 
-
-	//Calculate Fingerprint
 	cout << "Size of x: " << x.rows() << "x" << x.cols() << endl;
 	for(int i = 0; i < nEnerBandsUsed; i++){
 		for(int j = 0; j < nFramesUsed; j++){
